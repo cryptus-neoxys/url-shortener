@@ -25,14 +25,14 @@ func newMongoClient(mongoURL string, mongoTimeout int) (*mongo.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	err := client.Ping(ctx, readpref.Primary())
+	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		return nil, err
 	}
 	return client, err
 }
 
-func NewMongoRepository(mongoURL, mongoDB string, mongoTimeout int) (shortener.Redirect, error) {
+func NewMongoRepository(mongoURL, mongoDB string, mongoTimeout int) (*mongoRepository, error) {
 	repo := &mongoRepository{
 		timeout:  time.Duration(mongoTimeout) * time.Second,
 		database: mongoDB,
@@ -54,7 +54,7 @@ func (r *mongoRepository) Find(code string) (*shortener.Redirect, error) {
 	err := collection.FindOne(ctx, filter).Decode(&redirect)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, errors.Wrap(shortener.ErrRedirectNotFound.Error())
+			return nil, errors.Wrap(shortener.ErrRedirectNotFound, "repository.Redirect.Find")
 		}
 		return nil, errors.Wrap(err, "repository.Redirect.Find")
 	}
@@ -66,11 +66,11 @@ func (r *mongoRepository) Store(redirect *shortener.Redirect) error {
 	defer cancel()
 	collection := r.client.Database(r.database).Collection("redirects")
 	_, err := collection.InsertOne(
-		ctx, 
-		bson.M {
-			"code": redirect.Code,
-			"url": redirect.URL,
-			"created_at": redirect.CreatedAt
+		ctx,
+		bson.M{
+			"code":       redirect.Code,
+			"url":        redirect.URL,
+			"created_at": redirect.CreatedAt,
 		},
 	)
 	if err != nil {
