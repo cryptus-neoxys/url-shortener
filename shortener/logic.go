@@ -11,7 +11,7 @@ import (
 
 var (
 	ErrRedirectNotFound = errors.New("Redirect Not Found")
-	ErrRedirectInvalid = errors.New("Redirect Invalid")
+	ErrRedirectInvalid  = errors.New("Redirect Invalid")
 )
 
 type redirectService struct {
@@ -19,7 +19,7 @@ type redirectService struct {
 }
 
 func NewRedirectService(redirectRepo RedirectRepository) RedirectService {
-	return &redirectService {
+	return &redirectService{
 		redirectRepo,
 	}
 }
@@ -29,7 +29,7 @@ func (r *redirectService) Find(code string) (*Redirect, error) {
 }
 
 func (r *redirectService) Store(redirect *Redirect) error {
-	if err:= validate.Validate(redirect); err != nil {
+	if err := validate.Validate(redirect); err != nil {
 		return errs.Wrap(ErrRedirectInvalid, "service.Redirect.Store")
 	}
 	redirect.Code = shortid.MustGenerate()
