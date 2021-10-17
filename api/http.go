@@ -1,9 +1,11 @@
 package api
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	js "github.com/cryptus-neoxys/url-shortener/serializer/json"
 	ms "github.com/cryptus-neoxys/url-shortener/serializer/msgpack"
@@ -15,6 +17,7 @@ import (
 type RedirectHandler interface {
 	Get(http.ResponseWriter, *http.Request)
 	Post(http.ResponseWriter, *http.Request)
+	Land(http.ResponseWriter, *http.Request)
 }
 
 type handler struct {
@@ -82,4 +85,12 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	setupResponse(w, contentType, responseBody, http.StatusCreated)
+}
+
+func (h *handler) Land(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, `{
+		"Hello World": "%s",
+		"Post '/'": "Post(JSON body) -> {url: 'https://www.google.com/'}",
+		"Get '/{code}'": "Get -> shotrl.herokuapp.com/YYmgPHd7R"}`, time.Now().Local())
+	// return
 }
