@@ -1,5 +1,6 @@
 module github.com/cryptus-neoxys/url-shortener
 
+// +heroku goVersion go1.17
 go 1.17
 
 require github.com/pkg/errors v0.9.1
